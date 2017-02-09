@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
-import Advanced from './Advanced.js'
+import Advanced from './Advanced.js';
+import Results from './Results.js';
 import './normalize.css';
 import './skeleton.css';
 import './App.css';
@@ -34,24 +35,7 @@ class App extends Component {
           <span>2 results</span>
           <button onClick={this.toggleAdvanced.bind(this)} className="button-primary" id="main-filter-button">Advanced Filter</button>
         </div>
-        <div className="App-results">
-          <div className="result-number">1</div>
-          <div className="result">
-            <ul>
-              <li>Liberty Square</li>
-              <li>$340/mo</li>
-            </ul>
-          </div>
-        </div>
-        <div className="App-results">
-          <div className="result-number">2</div>
-          <div className="result">
-            <ul>
-              <li>Centenial Apartments</li>
-              <li>$315/mo</li>
-            </ul>
-          </div>
-        </div>
+        <Results />
       </div>
     );
   }

@@ -1,4 +1,23 @@
 import React, { Component } from 'react';
+import { connect } from 'react-redux';
+import {filterMale} from './redux/filter';
+import {filterFemale} from './redux/filter';
+import {filterBeds} from './redux/filter';
+import {filterBaths} from './redux/filter';
+import {filterLength} from './redux/filter';
+import {filterMin} from './redux/filter';
+import {filterMax} from './redux/filter';
+import {filterUtilities} from './redux/filter';
+import {filterAmenities} from './redux/filter';
+import {removeMale} from './redux/filter';
+import {removeFemale} from './redux/filter';
+import {removeBeds} from './redux/filter';
+import {removeBaths} from './redux/filter';
+import {removeLength} from './redux/filter';
+import {removeMin} from './redux/filter';
+import {removeMax} from './redux/filter';
+import {removeUtilities} from './redux/filter';
+import {removeAmenities} from './redux/filter';
 
 class Advanced extends Component {
 
@@ -29,15 +48,31 @@ class Advanced extends Component {
       male: 'default toggle-button',
       female: 'default toggle-button'
     }
+    this.makeSelectionBeds = this.makeSelectionBeds.bind(this);
+    this.makeSelectionBaths = this.makeSelectionBaths.bind(this);
+    this.makeSelectionLength = this.makeSelectionLength.bind(this);
+    this.findRangeMin = this.findRangeMin.bind(this);
+    this.findRangeMax = this.findRangeMax.bind(this);
   }
 
-  setButActive(button) {
+  setButActive(button, filt) {
     var obj = {};
     if (this.state[button].indexOf('default') >= 0) {
       if (button === 'male' || button === 'female') {
         obj[button] = 'button-primary toggle-button';
       } else {
         obj[button] = 'button-primary';
+      }
+      switch (filt) {
+        case 'male': this.props.filterMale(button); break;
+        case 'female': this.props.filterFemale(button); break;
+        case 'beds': this.props.filterBeds(button); break;
+        case 'baths': this.props.filterBaths(button); break;
+        case 'length': this.props.filterLength(button); break;
+        case 'min': this.props.filterMin(button); break;
+        case 'max': this.props.filterMax(button); break;
+        case 'utilities': this.props.filterUtilities(button); break;
+        case 'amenities': this.props.filterAmenities(button); break;
       }
       this.setState(obj);
     } else {
@@ -46,8 +81,39 @@ class Advanced extends Component {
       } else {
         obj[button] = 'default';
       }
+      switch (filt) {
+        case 'male': this.props.removeMale(''); break;
+        case 'female': this.props.removeFemale(''); break;
+        case 'beds': this.props.removeBeds(''); break;
+        case 'baths': this.props.removeBaths(''); break;
+        case 'length': this.props.removeLength(''); break;
+        case 'min': this.props.removeMin(''); break;
+        case 'max': this.props.removeMax(''); break;
+        case 'utilities': this.props.removeUtilities(button); break;
+        case 'amenities': this.props.removeAmenities(button); break;
+      }
       this.setState(obj);
     }
+  }
+
+  makeSelectionBeds(event) {
+    this.props.filterBeds(event.target.value);
+  }
+
+  makeSelectionBaths(event) {
+    this.props.filterBaths(event.target.value);
+  }
+
+  makeSelectionLength(event) {
+    this.props.filterLength(event.target.value);
+  }
+
+  findRangeMin(event) {
+    this.props.filterMin(event.target.value);
+  }
+
+  findRangeMax(event) {
+    this.props.filterMax(event.target.value);
   }
 
   render() {
@@ -55,12 +121,13 @@ class Advanced extends Component {
       <div>
         <div id="first-mid" className="App-content-mid">
           <div className="content-group-1">
-            <button className={this.state.male} onClick={this.setButActive.bind(this, 'male')}><p>M</p></button>
-            <button className={this.state.female} onClick={this.setButActive.bind(this, 'female')}><p>F</p></button>
+            <button className={this.state.male} onClick={this.setButActive.bind(this, 'male', 'male')}><p>M</p></button>
+            <button className={this.state.female} onClick={this.setButActive.bind(this, 'female', 'female')}><p>F</p></button>
           </div>
           <div className="content-group-1">
             <span>Beds:</span>
-            <select>
+            <select onChange={this.makeSelectionBeds}>
+              <option value=""></option>
               <option value="1">1</option>
               <option value="2">2</option>
               <option value="3">3</option>
@@ -69,7 +136,8 @@ class Advanced extends Component {
           </div>
           <div className="content-group-1">
             <span>Baths:</span>
-            <select>
+            <select onChange={this.makeSelectionBaths}>
+              <option value=""></option>
               <option value="1">1</option>
               <option value="2">2</option>
               <option value="3">3</option>
@@ -77,7 +145,8 @@ class Advanced extends Component {
           </div>
           <div className="content-group-1">
             <span>Length:</span>
-            <select>
+            <select onChange={this.makeSelectionLength}>
+              <option value=""></option>
               <option value="Yr">Yr</option>
               <option value="FW">FW</option>
               <option value="SpSu">SpSu</option>
@@ -89,39 +158,39 @@ class Advanced extends Component {
           </div>
           <div className="content-group-1 short-input">
             <span>Rent:</span>
-            <input type="text" placeholder="min"/>
+            <input type="text" placeholder="min" onChange={this.findRangeMin}/>
             <input type="text" placeholder="max"/>
           </div>
         </div>
         <div className="App-content-mid">
           <div className="content-group">
             <span>Utilities:</span>
-            <button className={this.state.cable} onClick={this.setButActive.bind(this, 'cable')}><p>Cable TV</p></button>
-            <button className={this.state.electricity} onClick={this.setButActive.bind(this, 'electricity')}><p>Electricity</p></button>
-            <button className={this.state.gas} onClick={this.setButActive.bind(this, 'gas')}><p>Gas</p></button>
-            <button className={this.state.internet} onClick={this.setButActive.bind(this, 'internet')}><p>Internet</p></button>
-            <button className={this.state.water} onClick={this.setButActive.bind(this, 'water')}><p>Water</p></button>
+            <button className={this.state.cable} onClick={this.setButActive.bind(this, 'cable', 'utilities')}><p>Cable TV</p></button>
+            <button className={this.state.electricity} onClick={this.setButActive.bind(this, 'electricity', 'utilities')}><p>Electricity</p></button>
+            <button className={this.state.gas} onClick={this.setButActive.bind(this, 'gas', 'utilities')}><p>Gas</p></button>
+            <button className={this.state.internet} onClick={this.setButActive.bind(this, 'internet', 'utilities')}><p>Internet</p></button>
+            <button className={this.state.water} onClick={this.setButActive.bind(this, 'water', 'utilities')}><p>Water</p></button>
           </div>
         </div>
         <div className="App-content-mid">
           <div className="content-group">
             <span>Amenities:</span>
-            <button className={this.state.airConditioning} onClick={this.setButActive.bind(this, 'airConditioning')}><p>Air Conditioning</p></button>
-            <button className={this.state.dishwasher} onClick={this.setButActive.bind(this, 'dishwasher')}><p>Dishwasher</p></button>
-            <button className={this.state.disposal} onClick={this.setButActive.bind(this, 'disposal')}><p>Disposal</p></button>
-            <button className={this.state.microwave} onClick={this.setButActive.bind(this, 'microwave')}><p>Microwave</p></button>
-            <button className={this.state.laundryFacility} onClick={this.setButActive.bind(this, 'laundryFacility')}><p>Laundry Facility</p></button>
-            <button className={this.state.washerDryer} onClick={this.setButActive.bind(this, 'washerDryer')}><p>Washer/Dryer</p></button>
-            <button className={this.state.ethernet} onClick={this.setButActive.bind(this, 'ethernet')}><p>Ethernet</p></button>
-            <button className={this.state.pool} onClick={this.setButActive.bind(this, 'pool')}><p>Pool</p></button>
-            <button className={this.state.hotTub} onClick={this.setButActive.bind(this, 'hotTub')}><p>Hot Tub</p></button>
-            <button className={this.state.gymEquipment} onClick={this.setButActive.bind(this, 'gymEquipment')}><p>Gym Equipment</p></button>
-            <button className={this.state.clubhouse} onClick={this.setButActive.bind(this, 'clubhouse')}><p>Clubhouse</p></button>
-            <button className={this.state.extraStorage} onClick={this.setButActive.bind(this, 'extraStorage')}><p>Extra Storage</p></button>
-            <button className={this.state.recyclingBins} onClick={this.setButActive.bind(this, 'recyclingBins')}><p>Recycling Bins</p></button>
-            <button className={this.state.adaAccessibility} onClick={this.setButActive.bind(this, 'adaAccessibility')}><p>ADA Accessible</p></button>
-            <button className={this.state.coveredParking} onClick={this.setButActive.bind(this, 'coveredParking')}><p>Covered Parking</p></button>
-            <button className={this.state.nearRydeUTA} onClick={this.setButActive.bind(this,'nearRydeUTA')}><p>Near Ryde/UTA</p></button>
+            <button className={this.state.airConditioning} onClick={this.setButActive.bind(this, 'airConditioning', 'amenities')}><p>Air Conditioning</p></button>
+            <button className={this.state.dishwasher} onClick={this.setButActive.bind(this, 'dishwasher', 'amenities')}><p>Dishwasher</p></button>
+            <button className={this.state.disposal} onClick={this.setButActive.bind(this, 'disposal', 'amenities')}><p>Disposal</p></button>
+            <button className={this.state.microwave} onClick={this.setButActive.bind(this, 'microwave', 'amenities')}><p>Microwave</p></button>
+            <button className={this.state.laundryFacility} onClick={this.setButActive.bind(this, 'laundryFacility', 'amenities')}><p>Laundry Facility</p></button>
+            <button className={this.state.washerDryer} onClick={this.setButActive.bind(this, 'washerDryer', 'amenities')}><p>Washer/Dryer</p></button>
+            <button className={this.state.ethernet} onClick={this.setButActive.bind(this, 'ethernet', 'amenities')}><p>Ethernet</p></button>
+            <button className={this.state.pool} onClick={this.setButActive.bind(this, 'pool', 'amenities')}><p>Pool</p></button>
+            <button className={this.state.hotTub} onClick={this.setButActive.bind(this, 'hotTub', 'amenities')}><p>Hot Tub</p></button>
+            <button className={this.state.gymEquipment} onClick={this.setButActive.bind(this, 'gymEquipment', 'amenities')}><p>Gym Equipment</p></button>
+            <button className={this.state.clubhouse} onClick={this.setButActive.bind(this, 'clubhouse', 'amenities')}><p>Clubhouse</p></button>
+            <button className={this.state.extraStorage} onClick={this.setButActive.bind(this, 'extraStorage', 'amenities')}><p>Extra Storage</p></button>
+            <button className={this.state.recyclingBins} onClick={this.setButActive.bind(this, 'recyclingBins', 'amenities')}><p>Recycling Bins</p></button>
+            <button className={this.state.adaAccessibility} onClick={this.setButActive.bind(this, 'adaAccessibility', 'amenities')}><p>ADA Accessible</p></button>
+            <button className={this.state.coveredParking} onClick={this.setButActive.bind(this, 'coveredParking', 'amenities')}><p>Covered Parking</p></button>
+            <button className={this.state.nearRydeUTA} onClick={this.setButActive.bind(this,'nearRydeUTA', 'amenities')}><p>Near Ryde/UTA</p></button>
           </div>
         </div>
       </div>
@@ -129,4 +198,25 @@ class Advanced extends Component {
   }
 }
 
-export default Advanced;
+const mapDispatchToProps = {
+  filterMale: filterMale,
+  filterFemale: filterFemale,
+  filterBeds: filterBeds,
+  filterBaths: filterBaths,
+  filterLength: filterLength,
+  filterMin: filterMin,
+  filterMax: filterMax,
+  filterUtilities: filterUtilities,
+  filterAmenities: filterAmenities,
+  removeMale: removeMale,
+  removeFemale: removeFemale,
+  removeBeds: removeBeds,
+  removeBaths: removeBaths,
+  removeLength: removeLength,
+  removeMin: removeMin,
+  removeMax: removeMax,
+  removeUtilities: removeUtilities,
+  removeAmenities: removeAmenities
+}
+
+export default connect(null, mapDispatchToProps)(Advanced);

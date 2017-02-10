@@ -1,23 +1,10 @@
 import React, { Component } from 'react';
-import {getApartments} from "./apartments.js";
+import {connect} from 'react-redux';
 
 class Results extends Component {
-  constructor(props) {
-    super(props)
-
-    this.state = {
-      apartments: []
-    }
-
-  }
-  componentWillMount() {
-    this.setState({
-      apartments: getApartments()
-    });
-  }
+  
   render() {
-    console.log(this.props.cable); //trying to get props from advanced
-    var apartments = this.state.apartments.map((apartment, i) => {
+    var apartments = this.props.apartments.map((apartment, i) => {
       return (
         <div key={i} className="App-results">
           <div className="result-number">{i+1}</div>
@@ -38,4 +25,10 @@ class Results extends Component {
   }
 }
 
-export default Results;
+function mapStateToProps(state) {
+  return {
+    apartments: state.apartments
+  }
+}
+
+export default connect(mapStateToProps)(Results);

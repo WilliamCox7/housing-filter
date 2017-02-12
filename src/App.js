@@ -31,6 +31,7 @@ class App extends Component {
   }
 
   render() {
+    var numOfApts = this.props.numOfApts;
     return (
       <div className="App container">
         <div className="App-header">
@@ -41,7 +42,7 @@ class App extends Component {
         </div>
         {this.state.showfilter ? <Advanced /> : null}
         <div className="App-content-end">
-          <span>2 results</span>
+          <span>{numOfApts} results</span>
           <button onClick={this.toggleAdvanced} className="button-primary" id="main-filter-button">Advanced Filter</button>
         </div>
         <Results />
@@ -54,4 +55,10 @@ const mapDispatchToProps = {
   filterName: filterName
 }
 
-export default connect(null, mapDispatchToProps)(App);
+function mapStateToProps(state) {
+  return {
+    numOfApts: state.numOfApts
+  }
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(App);

@@ -2,6 +2,8 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import {filterMale} from './redux/filter';
 import {filterFemale} from './redux/filter';
+import {filterPrivate} from './redux/filter';
+import {filterShared} from './redux/filter';
 import {filterBeds} from './redux/filter';
 import {filterBaths} from './redux/filter';
 import {filterLength} from './redux/filter';
@@ -11,6 +13,8 @@ import {filterUtilities} from './redux/filter';
 import {filterAmenities} from './redux/filter';
 import {removeMale} from './redux/filter';
 import {removeFemale} from './redux/filter';
+import {removePrivate} from './redux/filter';
+import {removeShared} from './redux/filter';
 import {removeBeds} from './redux/filter';
 import {removeBaths} from './redux/filter';
 import {removeLength} from './redux/filter';
@@ -46,7 +50,9 @@ class Advanced extends Component {
       coveredParking: 'default',
       nearRydeUTA: 'default',
       male: 'default toggle-button',
-      female: 'default toggle-button'
+      female: 'default toggle-button',
+      priv: 'default',
+      shared: 'default'
     }
     this.makeSelectionBeds = this.makeSelectionBeds.bind(this);
     this.makeSelectionBaths = this.makeSelectionBaths.bind(this);
@@ -66,6 +72,8 @@ class Advanced extends Component {
       switch (filt) {
         case 'male': this.props.filterMale(button); break;
         case 'female': this.props.filterFemale(button); break;
+        case 'priv': this.props.filterPrivate(true); break;
+        case 'shared': this.props.filterShared(true); break;
         case 'beds': this.props.filterBeds(button); break;
         case 'baths': this.props.filterBaths(button); break;
         case 'length': this.props.filterLength(button); break;
@@ -84,6 +92,8 @@ class Advanced extends Component {
       switch (filt) {
         case 'male': this.props.removeMale(''); break;
         case 'female': this.props.removeFemale(''); break;
+        case 'priv': this.props.removePrivate(false); break;
+        case 'shared': this.props.removeShared(false); break;
         case 'beds': this.props.removeBeds(''); break;
         case 'baths': this.props.removeBaths(''); break;
         case 'length': this.props.removeLength(''); break;
@@ -159,7 +169,11 @@ class Advanced extends Component {
           <div className="content-group-1 short-input">
             <span>Rent:</span>
             <input type="text" placeholder="min" onChange={this.findRangeMin}/>
-            <input type="text" placeholder="max"/>
+            <input type="text" placeholder="max" onChange={this.findRangeMax}/>
+          </div>
+          <div className="content-group-1">
+            <button className={this.state.priv} onClick={this.setButActive.bind(this, 'priv', 'priv')}><p>Private</p></button>
+            <button className={this.state.shared} onClick={this.setButActive.bind(this, 'shared', 'shared')}><p>Shared</p></button>
           </div>
         </div>
         <div className="App-content-mid">
@@ -201,6 +215,8 @@ class Advanced extends Component {
 const mapDispatchToProps = {
   filterMale: filterMale,
   filterFemale: filterFemale,
+  filterPrivate: filterPrivate,
+  filterShared: filterShared,
   filterBeds: filterBeds,
   filterBaths: filterBaths,
   filterLength: filterLength,
@@ -210,6 +226,8 @@ const mapDispatchToProps = {
   filterAmenities: filterAmenities,
   removeMale: removeMale,
   removeFemale: removeFemale,
+  removePrivate: removePrivate,
+  removeShared: removeShared,
   removeBeds: removeBeds,
   removeBaths: removeBaths,
   removeLength: removeLength,

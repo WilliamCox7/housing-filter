@@ -2,7 +2,9 @@ import {getApartments} from "../apartments.js";
 
 const SEARCH = 'aptFilter/SEARCH';
 const MALE = 'aptFilter/MALE';
-const FEMALE = 'aptFilter/FEMALE'
+const FEMALE = 'aptFilter/FEMALE';
+const PRIVATE = 'aptFilter/PRIVATE';
+const SHARED = 'aptFilter/SHARED';
 const BEDS = 'aptFilter/BEDS';
 const BATHS = 'aptFilter/BATHS';
 const LENGTH = 'aptFilter/LENGTH';
@@ -11,7 +13,9 @@ const RENT_MAX = 'aptFilter/RENT_MAX';
 const UTILITIES = 'aptFilter/UTILITIES';
 const AMENITIES = 'aptFilter/AMENITIES';
 const REMOVE_MALE = 'aptFilter/REMOVE_MALE';
-const REMOVE_FEMALE = 'aptFilter/REMOVE_FEMALE'
+const REMOVE_FEMALE = 'aptFilter/REMOVE_FEMALE';
+const REMOVE_PRIVATE = 'aptFilter/REMOVE_PRIVATE';
+const REMOVE_SHARED = 'aptFilter/REMOVE_SHARED';
 const REMOVE_BEDS = 'aptFilter/REMOVE_BEDS';
 const REMOVE_BATHS = 'aptFilter/REMOVE_BATHS';
 const REMOVE_LENGTH = 'aptFilter/REMOVE_LENGTH';
@@ -24,15 +28,18 @@ const initialState = {
   filterBy: {
     srch: '',
     gender: '',
+    priv: undefined,
+    shared: undefined,
     beds: '',
     baths: '',
-    length: '',
+    len: '',
     min: '',
     max: '',
     utilities: [],
     amenities: []
   },
-  apartments: []
+  apartments: [],
+  numOfApts: 0
 }
 
 function filterApartments(toCheck) {
@@ -51,6 +58,26 @@ function filterApartments(toCheck) {
             });
             return hasAllItems;
           });
+        } else if (filterItem === 'min') {
+          filteredItems = filteredItems.filter(function(item) {
+            return checkMin(item, toCheck.len, filterValue);
+          });
+        } else if (filterItem === 'max') {
+          filteredItems = filteredItems.filter(function(item) {
+            return checkMax(item, toCheck.len, filterValue);
+          });
+        } else if (filterItem === 'priv' || filterItem === 'shared') {
+          filteredItems = filteredItems.filter(function(item) {
+            if (toCheck.len.indexOf('Sp') >= 0 || toCheck.len.indexOf('Su') >= 0) {
+              if (filterItem === 'priv') {
+                return item.spSuPriv === filterValue;
+              } else {
+                return item.spSuShared === filterValue;
+              }
+            } else {
+              return item[filterItem] === filterValue;
+            }
+          });
         } else {
           filteredItems = filteredItems.filter(function(item) {
             return item[filterItem].toString().indexOf(filterValue) >= 0;
@@ -64,14 +91,92 @@ function filterApartments(toCheck) {
   return filteredItems;
 }
 
+function checkMin(item, len, filterValue) {
+
+  if (len.indexOf('Sp') >= 0 || len.indexOf('Su') >= 0) {
+    if (item.spSuPrivateRent.length > 0) {
+      if (item.spSuPrivateRent[1] >= filterValue) {
+         return true;
+       } else {
+         return false;
+       }
+    } else if (item.spSuSharedRent.length > 0) {
+      if (item.spSuSharedRent[1] >= filterValue) {
+        return true;
+      } else {
+        return false;
+      }
+    } else {
+      return false;
+    }
+  } else {
+    if (item.privateRent.length > 0) {
+      if (item.privateRent[1] >= filterValue) {
+        return true;
+      } else {
+        return false;
+      }
+    } else if (item.sharedRent.length > 0) {
+      if (item.sharedRent[1] >= filterValue) {
+        return true;
+      } else {
+        return false;
+      }
+    } else {
+      return false;
+    }
+  }
+
+}
+
+function checkMax(item, len, filterValue) {
+
+  if (len.indexOf('Sp') >= 0 || len.indexOf('Su') >= 0) {
+    if (item.spSuPrivateRent.length > 0) {
+      if (item.spSuPrivateRent[1] <= filterValue) {
+         return true;
+       } else {
+         return false;
+       }
+    } else if (item.spSuSharedRent.length > 0) {
+      if (item.spSuSharedRent[1] <= filterValue) {
+        return true;
+      } else {
+        return false;
+      }
+    } else {
+      return false;
+    }
+  } else {
+    if (item.privateRent.length > 0) {
+      if (item.privateRent[1] <= filterValue) {
+        return true;
+      } else {
+        return false;
+      }
+    } else if (item.sharedRent.length > 0) {
+      if (item.sharedRent[1] <= filterValue) {
+        return true;
+      } else {
+        return false;
+      }
+    } else {
+      return false;
+    }
+  }
+
+}
+
 function searchApartments(srch, toCheck) {
   var apartments = filterApartments(toCheck);
   var BreakException = {};
   var filteredItems = [];
+  srch = srch.toLowerCase();
   apartments.forEach(function(apartment) {
     try {
       Object.keys(apartment).forEach(function(key) {
-        if (apartment[key].toString().indexOf(srch) >= 0) {
+        var infoToSearch = apartment[key].toString().toLowerCase();
+        if (infoToSearch.indexOf(srch) >= 0) {
           filteredItems.unshift(apartment);
           throw BreakException;
         }
@@ -91,114 +196,161 @@ export default function reducer(state=initialState, action) {
       newState.filterBy.srch = action.payload;
       newApartments = searchApartments(action.payload, newState.filterBy);
       newState.apartments = newApartments;
+      newState.numOfApts = newApartments.length;
       return Object.assign({}, newState);
     case MALE:
       newState = Object.assign({}, state);
       newState.filterBy.gender = action.payload;
       newApartments = filterApartments(newState.filterBy);
       newState.apartments = newApartments;
+      newState.numOfApts = newApartments.length;
       return Object.assign({}, newState);
     case FEMALE:
       newState = Object.assign({}, state);
       newState.filterBy.gender = action.payload;
       newApartments = filterApartments(newState.filterBy);
       newState.apartments = newApartments;
+      newState.numOfApts = newApartments.length;
+      return Object.assign({}, newState);
+    case PRIVATE:
+      newState = Object.assign({}, state);
+      newState.filterBy.priv = action.payload;
+      newApartments = filterApartments(newState.filterBy);
+      newState.apartments = newApartments;
+      newState.numOfApts = newApartments.length;
+      return Object.assign({}, newState);
+    case SHARED:
+      newState = Object.assign({}, state);
+      newState.filterBy.shared = action.payload;
+      newApartments = filterApartments(newState.filterBy);
+      newState.apartments = newApartments;
+      newState.numOfApts = newApartments.length;
       return Object.assign({}, newState);
     case BEDS:
       newState = Object.assign({}, state);
       newState.filterBy.beds = action.payload;
       newApartments = filterApartments(newState.filterBy);
       newState.apartments = newApartments;
+      newState.numOfApts = newApartments.length;
       return Object.assign({}, newState);
     case BATHS:
       newState = Object.assign({}, state);
       newState.filterBy.baths = action.payload;
       newApartments = filterApartments(newState.filterBy);
       newState.apartments = newApartments;
+      newState.numOfApts = newApartments.length;
       return Object.assign({}, newState);
     case LENGTH:
       newState = Object.assign({}, state);
-      newState.filterBy.length = action.payload;
+      newState.filterBy.len = action.payload;
       newApartments = filterApartments(newState.filterBy);
       newState.apartments = newApartments;
+      newState.numOfApts = newApartments.length;
       return Object.assign({}, newState);
     case RENT_MIN:
       newState = Object.assign({}, state);
       newState.filterBy.min = action.payload;
       newApartments = filterApartments(newState.filterBy);
       newState.apartments = newApartments;
+      newState.numOfApts = newApartments.length;
       return Object.assign({}, newState);
     case RENT_MAX:
       newState = Object.assign({}, state);
       newState.filterBy.max = action.payload;
       newApartments = filterApartments(newState.filterBy);
       newState.apartments = newApartments;
+      newState.numOfApts = newApartments.length;
       return Object.assign({}, newState);
     case UTILITIES:
       newState = Object.assign({}, state);
       newState.filterBy.utilities.push(action.payload);
       newApartments = filterApartments(newState.filterBy);
       newState.apartments = newApartments;
+      newState.numOfApts = newApartments.length;
       return Object.assign({}, newState);
     case AMENITIES:
       newState = Object.assign({}, state);
       newState.filterBy.amenities.push(action.payload);
       newApartments = filterApartments(newState.filterBy);
       newState.apartments = newApartments;
+      newState.numOfApts = newApartments.length;
       return Object.assign({}, newState);
     case REMOVE_MALE:
       newState = Object.assign({}, state);
       newState.filterBy.gender = action.payload;
       newApartments = filterApartments(newState.filterBy);
       newState.apartments = newApartments;
+      newState.numOfApts = newApartments.length;
       return Object.assign({}, newState);
     case REMOVE_FEMALE:
       newState = Object.assign({}, state);
       newState.filterBy.gender = action.payload;
       newApartments = filterApartments(newState.filterBy);
       newState.apartments = newApartments;
+      newState.numOfApts = newApartments.length;
+      return Object.assign({}, newState);
+    case REMOVE_PRIVATE:
+      newState = Object.assign({}, state);
+      newState.filterBy.priv = action.payload;
+      newApartments = filterApartments(newState.filterBy);
+      newState.apartments = newApartments;
+      newState.numOfApts = newApartments.length;
+      return Object.assign({}, newState);
+    case REMOVE_SHARED:
+      newState = Object.assign({}, state);
+      newState.filterBy.shared = action.payload;
+      newApartments = filterApartments(newState.filterBy);
+      newState.apartments = newApartments;
+      newState.numOfApts = newApartments.length;
       return Object.assign({}, newState);
     case REMOVE_BEDS:
       newState = Object.assign({}, state);
       newState.filterBy.beds = action.payload;
       newApartments = filterApartments(newState.filterBy);
       newState.apartments = newApartments;
+      newState.numOfApts = newApartments.length;
       return Object.assign({}, newState);
     case REMOVE_BATHS:
       newState = Object.assign({}, state);
       newState.filterBy.baths = action.payload;
       newApartments = filterApartments(newState.filterBy);
       newState.apartments = newApartments;
+      newState.numOfApts = newApartments.length;
       return Object.assign({}, newState);
     case REMOVE_LENGTH:
       newState = Object.assign({}, state);
-      newState.filterBy.length = action.payload;
+      newState.filterBy.len = action.payload;
       newApartments = filterApartments(newState.filterBy);
       newState.apartments = newApartments;
+      newState.numOfApts = newApartments.length;
       return Object.assign({}, newState);
     case REMOVE_RENT_MIN:
       newState = Object.assign({}, state);
       newState.filterBy.min = action.payload;
       newApartments = filterApartments(newState.filterBy);
       newState.apartments = newApartments;
+      newState.numOfApts = newApartments.length;
       return Object.assign({}, newState);
     case REMOVE_RENT_MAX:
       newState = Object.assign({}, state);
       newState.filterBy.max = action.payload;
       newApartments = filterApartments(newState.filterBy);
       newState.apartments = newApartments;
+      newState.numOfApts = newApartments.length;
       return Object.assign({}, newState);
     case REMOVE_UTILITIES:
       newState = Object.assign({}, state);
       newState.filterBy.utilities.splice(newState.filterBy.utilities.indexOf(action.payload), 1);
       newApartments = filterApartments(newState.filterBy);
       newState.apartments = newApartments;
+      newState.numOfApts = newApartments.length;
       return Object.assign({}, newState);
     case REMOVE_AMENITIES:
       newState = Object.assign({}, state);
       newState.filterBy.amenities.splice(newState.filterBy.amenities.indexOf(action.payload), 1);
       newApartments = filterApartments(newState.filterBy);
       newState.apartments = newApartments;
+      newState.numOfApts = newApartments.length;
       return Object.assign({}, newState);
     default: return state;
   }
@@ -225,6 +377,20 @@ export function filterFemale(gender) {
   }
 }
 
+export function filterPrivate(priv) {
+  return {
+    type: PRIVATE,
+    payload: priv
+  }
+}
+
+export function filterShared(shared) {
+  return {
+    type: SHARED,
+    payload: shared
+  }
+}
+
 export function filterBeds(beds) {
   return {
     type: BEDS,
@@ -239,10 +405,10 @@ export function filterBaths(baths) {
   }
 }
 
-export function filterLength(length) {
+export function filterLength(len) {
   return {
     type: LENGTH,
-    payload: length
+    payload: len
   }
 }
 
@@ -288,6 +454,20 @@ export function removeFemale(gender) {
   }
 }
 
+export function removePrivate(priv) {
+  return {
+    type: REMOVE_PRIVATE,
+    payload: priv
+  }
+}
+
+export function removeShared(shared) {
+  return {
+    type: REMOVE_SHARED,
+    payload: shared
+  }
+}
+
 export function removeBeds(beds) {
   return {
     type: REMOVE_BEDS,
@@ -302,10 +482,10 @@ export function removeBaths(baths) {
   }
 }
 
-export function removeLength(length) {
+export function removeLength(len) {
   return {
     type: REMOVE_LENGTH,
-    payload: length
+    payload: len
   }
 }
 

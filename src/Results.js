@@ -6,19 +6,21 @@ class Results extends Component {
 
   render() {
     var apartments = this.props.apartments.map((apartment, i) => {
-      return (
-        <Link key={i} to={"apartment/" + apartment.name.split(" ").join("").toLowerCase()}>
-          <div className="App-results">
-            <div className="result-number">{i+1}</div>
-            <div className="result">
-              <ul>
-                <li>{apartment.name}</li>
-                <li>${apartment.sharedRent[0]}/mo</li>
-              </ul>
+      if (i < 10) {
+        return (
+          <Link key={i} to={"apartment/" + apartment.name.split(" ").join("").toLowerCase()}>
+            <div className="App-results">
+              <div className="result-number">{i+1}</div>
+              <div className="result">
+                <ul>
+                  <li>{apartment.name}</li>
+                  <li>${apartment.yrSharedRent[0]}/mo</li>
+                </ul>
+              </div>
             </div>
-          </div>
-        </Link>
-      )
+          </Link>
+        )
+      }
     });
     return (
       <div>

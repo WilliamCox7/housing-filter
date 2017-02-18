@@ -75,7 +75,7 @@ class Apartment extends Component {
                 <span>Length:</span><span className="spanResult">{apartment.len}</span>
               </div>
               <div className="content-group-1 short-input">
-                <span>Rent:</span><span className="spanResult">${apartment.sharedRent[0]} - ${apartment.sharedRent[1]}/mo</span>
+                <span>Rent:</span><span className="spanResult">${apartment.yrSharedRent[0]} - ${apartment.yrSharedRent[1]}/mo</span>
               </div>
               <div className="content-group-1">
                 <button className={displayObj.priv}><p>Private</p></button>

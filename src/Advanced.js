@@ -81,6 +81,7 @@ class Advanced extends Component {
         case 'max': this.props.filterMax(button); break;
         case 'utilities': this.props.filterUtilities(button); break;
         case 'amenities': this.props.filterAmenities(button); break;
+        default: break;
       }
       this.setState(obj);
     } else {
@@ -101,6 +102,7 @@ class Advanced extends Component {
         case 'max': this.props.removeMax(''); break;
         case 'utilities': this.props.removeUtilities(button); break;
         case 'amenities': this.props.removeAmenities(button); break;
+        default: break;
       }
       this.setState(obj);
     }

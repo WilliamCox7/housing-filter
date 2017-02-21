@@ -33,7 +33,7 @@ const initialState = {
     beds: '',
     baths: '',
     len: '',
-    min: '',
+    min: 1,
     max: '',
     utilities: [],
     amenities: []
@@ -49,8 +49,8 @@ function filterApartments(toCheck) {
       var filterValue = toCheck[filterItem];
       if (filterValue) {
         if (Array.isArray(filterValue)) {
-          var hasAllItems = true;
           filteredItems = filteredItems.filter(function(item) {
+            var hasAllItems = true;
             filterValue.forEach(function(fVal) {
               if (item[filterItem].toString().indexOf(fVal) < 0) {
                 hasAllItems = false;
@@ -60,11 +60,11 @@ function filterApartments(toCheck) {
           });
         } else if (filterItem === 'min') {
           filteredItems = filteredItems.filter(function(item) {
-            return checkMin(item, toCheck.len, filterValue);
+            return checkMin(item, toCheck.len, filterValue, toCheck.priv, toCheck.shared);
           });
         } else if (filterItem === 'max') {
           filteredItems = filteredItems.filter(function(item) {
-            return checkMax(item, toCheck.len, filterValue);
+            return checkMax(item, toCheck.len, filterValue, toCheck.priv, toCheck.shared);
           });
         } else if (filterItem === 'priv' || filterItem === 'shared') {
           filteredItems = filteredItems.filter(function(item) {
@@ -74,8 +74,18 @@ function filterApartments(toCheck) {
               } else {
                 return item.spSuShared === filterValue;
               }
+            } else if (toCheck.len.indexOf('F') >= 0 || toCheck.len.indexOf('W') >= 0) {
+              if (filterItem === 'priv') {
+                return item.fwPriv === filterValue;
+              } else {
+                return item.fwShared === filterValue;
+              }
             } else {
-              return item[filterItem] === filterValue;
+              if (filterItem === 'priv') {
+                return item.yrPriv === filterValue;
+              } else {
+                return item.yrShared === filterValue;
+              }
             }
           });
         } else {
@@ -91,78 +101,297 @@ function filterApartments(toCheck) {
   return filteredItems;
 }
 
-function checkMin(item, len, filterValue) {
-
-  if (len.indexOf('Sp') >= 0 || len.indexOf('Su') >= 0) {
-    if (item.spSuPrivateRent.length > 0) {
-      if (item.spSuPrivateRent[1] >= filterValue) {
-         return true;
-       } else {
-         return false;
-       }
-    } else if (item.spSuSharedRent.length > 0) {
-      if (item.spSuSharedRent[1] >= filterValue) {
-        return true;
-      } else {
-        return false;
+function checkMin(item, len, min, priv, shared) {
+  if (len) {
+    var isAboveMin = false;
+    if (len.indexOf('Sp') >= 0 || len.indexOf('Su') >= 0) {
+      if (priv) {
+        if (item.spSuPrivateRent.length > 0) {
+          if (item.spSuPrivateRent[0] >= min) {
+            item.displayRate = item.spSuPrivateRent[0];
+            isAboveMin = true;
+          }
+        }
+      }
+      if (shared) {
+        if (item.spSuSharedRent.length > 0) {
+          if (item.spSuSharedRent[0] >= min) {
+            item.displayRate = item.spSuSharedRent[0];
+            isAboveMin = true;
+          }
+        }
+      }
+      if (!priv && !shared) {
+        if (item.spSuPrivateRent.length > 0) {
+          if (item.spSuPrivateRent[0] >= min) {
+            item.displayRate = item.spSuPrivateRent[0];
+            isAboveMin = true;
+          }
+        }
+        if (item.spSuSharedRent.length > 0) {
+          if (item.spSuSharedRent[0] >= min) {
+            item.displayRate = item.spSuSharedRent[0];
+            isAboveMin = true;
+          }
+        }
+      }
+    } else if (len.indexOf('F') >= 0 || len.indexOf('W') >= 0) {
+      if (priv) {
+        if (item.fwPrivateRent.length > 0) {
+            if (item.fwPrivateRent[0] >= min) {
+            item.displayRate = item.fwPrivateRent[0];
+            isAboveMin = true;
+          }
+        }
+      }
+      if (shared) {
+        if (item.fwSharedRent.length > 0) {
+          if (item.fwSharedRent[0] >= min) {
+            item.displayRate = item.fwSharedRent[0];
+            isAboveMin = true;
+          }
+        }
+      }
+      if (!priv && !shared) {
+        if (item.fwPrivateRent.length > 0) {
+            if (item.fwPrivateRent[0] >= min) {
+            item.displayRate = item.fwPrivateRent[0];
+            isAboveMin = true;
+          }
+        }
+        if (item.fwSharedRent.length > 0) {
+          if (item.fwSharedRent[0] >= min) {
+            item.displayRate = item.fwSharedRent[0];
+            isAboveMin = true;
+          }
+        }
       }
     } else {
-      return false;
+      if (priv) {
+        if (item.yrPrivateRent.length > 0) {
+          if (item.yrPrivateRent[0] >= min) {
+            item.displayRate = item.yrPrivateRent[0];
+            isAboveMin = true;
+          }
+        }
+      }
+      if (shared) {
+        if (item.yrSharedRent.length > 0) {
+          if (item.yrSharedRent[0] >= min) {
+            item.displayRate = item.yrSharedRent[0];
+            isAboveMin = true;
+          }
+        }
+      }
+      if (!priv && !shared) {
+        if (item.yrPrivateRent.length > 0) {
+          if (item.yrPrivateRent[0] >= min) {
+            item.displayRate = item.yrPrivateRent[0];
+            isAboveMin = true;
+          }
+        }
+        if (item.yrSharedRent.length > 0) {
+          if (item.yrSharedRent[0] >= min) {
+            item.displayRate = item.yrSharedRent[0];
+            isAboveMin = true;
+          }
+        }
+      }
     }
+    return isAboveMin;
   } else {
-    if (item.privateRent.length > 0) {
-      if (item.privateRent[1] >= filterValue) {
-        return true;
-      } else {
-        return false;
+    var isAboveMin = false;
+    if (priv) {
+      if (item.yrPrivateRent.length > 0) {
+        if (item.yrPrivateRent[0] >= min) {
+          item.displayRate = item.yrPrivateRent[0];
+          isAboveMin = true;
+        }
       }
-    } else if (item.sharedRent.length > 0) {
-      if (item.sharedRent[1] >= filterValue) {
-        return true;
-      } else {
-        return false;
+      if (item.fwPrivateRent.length > 0) {
+        if (item.fwPrivateRent[0] >= min) {
+          item.displayRate = item.fwPrivateRent[0];
+          isAboveMin = true;
+        }
       }
-    } else {
-      return false;
+      if (item.spSuPrivateRent.length > 0) {
+        if (item.spSuPrivateRent[0] >= min) {
+          item.displayRate = item.spSuPrivateRent[0];
+          isAboveMin = true;
+        }
+      }
     }
+    if (shared) {
+      if (item.yrSharedRent.length > 0) {
+        if (item.yrSharedRent[0] >= min) {
+          item.displayRate = item.yrSharedRent[0];
+          isAboveMin = true;
+        }
+      }
+      if (item.fwSharedRent.length > 0) {
+        if (item.fwSharedRent[0] >= min) {
+          item.displayRate = item.fwSharedRent[0];
+          isAboveMin = true;
+        }
+      }
+      if (item.spSuSharedRent.length > 0) {
+        if (item.spSuSharedRent[0] >= min) {
+          item.displayRate = item.spSuSharedRent[0];
+          isAboveMin = true;
+        }
+      }
+    }
+    if (!priv && !shared) {
+      if (item.yrPrivateRent.length > 0) {
+        if (item.yrPrivateRent[0] >= min) {
+          item.displayRate = item.yrPrivateRent[0];
+          isAboveMin = true;
+        }
+      }
+      if (item.fwPrivateRent.length > 0) {
+        if (item.fwPrivateRent[0] >= min) {
+          item.displayRate = item.fwPrivateRent[0];
+          isAboveMin = true;
+        }
+      }
+      if (item.spSuPrivateRent.length > 0) {
+        if (item.spSuPrivateRent[0] >= min) {
+          item.displayRate = item.spSuPrivateRent[0];
+          isAboveMin = true;
+        }
+      }
+      if (item.yrSharedRent.length > 0) {
+        if (item.yrSharedRent[0] >= min) {
+          item.displayRate = item.yrSharedRent[0];
+          isAboveMin = true;
+        }
+      }
+      if (item.fwSharedRent.length > 0) {
+        if (item.fwSharedRent[0] >= min) {
+          item.displayRate = item.fwSharedRent[0];
+          isAboveMin = true;
+        }
+      }
+      if (item.spSuSharedRent.length > 0) {
+        if (item.spSuSharedRent[0] >= min) {
+          item.displayRate = item.spSuSharedRent[0];
+          isAboveMin = true;
+        }
+      }
+    }
+    return isAboveMin;
   }
 
 }
 
-function checkMax(item, len, filterValue) {
+function checkMax(item, len, max, priv, shared) {
 
-  if (len.indexOf('Sp') >= 0 || len.indexOf('Su') >= 0) {
-    if (item.spSuPrivateRent.length > 0) {
-      if (item.spSuPrivateRent[1] <= filterValue) {
-         return true;
-       } else {
-         return false;
-       }
-    } else if (item.spSuSharedRent.length > 0) {
-      if (item.spSuSharedRent[1] <= filterValue) {
-        return true;
-      } else {
-        return false;
+  if (len) {
+    var isBelowMax = false;
+    if (len.indexOf('Sp') >= 0 || len.indexOf('Su') >= 0) {
+      if (priv) {
+        if (item.spSuPrivateRent.length > 0) {
+          if (item.spSuPrivateRent[item.spSuPrivateRent.length - 1] <= max) {
+            isBelowMax = true;
+          }
+        }
+      }
+      if (shared) {
+        if (item.spSuSharedRent.length > 0) {
+          if (item.spSuSharedRent[item.spSuSharedRent.length - 1] <= max) {
+            isBelowMax = true;
+          }
+        }
+      }
+      if (!priv && !shared) {
+        if (item.spSuPrivateRent.length > 0) {
+          if (item.spSuPrivateRent[item.spSuPrivateRent.length - 1] <= max) {
+            isBelowMax = true;
+          }
+        }
+        if (item.spSuSharedRent.length > 0) {
+          if (item.spSuSharedRent[item.spSuSharedRent.length - 1] <= max) {
+            isBelowMax = true;
+          }
+        }
+      }
+    } else if (len.indexOf('F') >= 0 || len.indexOf('W') >= 0) {
+      if (priv) {
+        if (item.fwPrivateRent.length > 0) {
+          if (item.fwPrivateRent[item.fwPrivateRent.length - 1] <= max) {
+            isBelowMax = true;
+          }
+        }
+      }
+      if (shared) {
+        if (item.fwSharedRent.length > 0) {
+          if (item.fwSharedRent[item.fwSharedRent.length - 1] <= max) {
+            isBelowMax = true;
+          }
+        }
+      }
+      if (!priv && !shared) {
+        if (item.fwPrivateRent.length > 0) {
+          if (item.fwPrivateRent[item.fwPrivateRent.length - 1] <= max) {
+            isBelowMax = true;
+          }
+        }
+        if (item.fwSharedRent.length > 0) {
+          if (item.fwSharedRent[item.fwSharedRent.length - 1] <= max) {
+            isBelowMax = true;
+          }
+        }
       }
     } else {
-      return false;
+      if (priv) {
+        if (item.yrPrivateRent.length > 0) {
+          if (item.yrPrivateRent[item.yrPrivateRent.length - 1] <= max) {
+            isBelowMax = true;
+          }
+        }
+      }
+      if (shared) {
+        if (item.yrSharedRent.length > 0) {
+          if (item.yrSharedRent[item.yrSharedRent.length - 1] <= max) {
+            isBelowMax = true;
+          }
+        }
+      }
+      if (!priv && !shared) {
+        if (item.yrPrivateRent.length > 0) {
+          if (item.yrPrivateRent[item.yrPrivateRent.length - 1] <= max) {
+            isBelowMax = true;
+          }
+        }
+        if (item.yrSharedRent.length > 0) {
+          if (item.yrSharedRent[item.yrSharedRent.length - 1] <= max) {
+            isBelowMax = true;
+          }
+        }
+      }
     }
+    return isBelowMax;
   } else {
-    if (item.privateRent.length > 0) {
-      if (item.privateRent[1] <= filterValue) {
-        return true;
-      } else {
-        return false;
-      }
-    } else if (item.sharedRent.length > 0) {
-      if (item.sharedRent[1] <= filterValue) {
-        return true;
-      } else {
-        return false;
-      }
-    } else {
-      return false;
+    var isBelowMax = false;
+    if (priv) {
+      if (item.yrPrivateRent.length > 0) { if (item.yrPrivateRent[item.yrPrivateRent.length - 1] <= max) { isBelowMax = true; } }
+      if (item.fwPrivateRent.length > 0) { if (item.fwPrivateRent[item.fwPrivateRent.length - 1] <= max) { isBelowMax = true; } }
+      if (item.spSuPrivateRent.length > 0) { if (item.spSuPrivateRent[item.spSuPrivateRent.length - 1] <= max) { isBelowMax = true; } }
     }
+    if (shared) {
+      if (item.yrSharedRent.length > 0) { if (item.yrSharedRent[item.yrSharedRent.length - 1] <= max) { isBelowMax = true; } }
+      if (item.fwSharedRent.length > 0) { if (item.fwSharedRent[item.fwSharedRent.length - 1] <= max) { isBelowMax = true; } }
+      if (item.spSuSharedRent.length > 0) { if (item.spSuSharedRent[item.spSuSharedRent.length - 1] <= max) { isBelowMax = true; } }
+    }
+    if (!priv && !shared) {
+      if (item.yrPrivateRent.length > 0) { if (item.yrPrivateRent[item.yrPrivateRent.length - 1] <= max) { isBelowMax = true; } }
+      if (item.fwPrivateRent.length > 0) { if (item.fwPrivateRent[item.fwPrivateRent.length - 1] <= max) { isBelowMax = true; } }
+      if (item.spSuPrivateRent.length > 0) { if (item.spSuPrivateRent[item.spSuPrivateRent.length - 1] <= max) { isBelowMax = true; } }
+      if (item.yrSharedRent.length > 0) { if (item.yrSharedRent[item.yrSharedRent.length - 1] <= max) { isBelowMax = true; } }
+      if (item.fwSharedRent.length > 0) { if (item.fwSharedRent[item.fwSharedRent.length - 1] <= max) { isBelowMax = true; } }
+      if (item.spSuSharedRent.length > 0) { if (item.spSuSharedRent[item.spSuSharedRent.length - 1] <= max) { isBelowMax = true; } }
+    }
+    return isBelowMax;
   }
 
 }
@@ -189,7 +418,7 @@ function searchApartments(srch, toCheck) {
 }
 
 export default function reducer(state=initialState, action) {
-  var newApartments, newState, newFilterBy;
+  var newApartments, newState;
   switch (action.type) {
     case SEARCH:
       newState = Object.assign({}, state);
@@ -197,161 +426,161 @@ export default function reducer(state=initialState, action) {
       newApartments = searchApartments(action.payload, newState.filterBy);
       newState.apartments = newApartments;
       newState.numOfApts = newApartments.length;
-      return Object.assign({}, newState);
+      return Object.assign({}, state, newState);
     case MALE:
       newState = Object.assign({}, state);
       newState.filterBy.gender = action.payload;
       newApartments = filterApartments(newState.filterBy);
       newState.apartments = newApartments;
       newState.numOfApts = newApartments.length;
-      return Object.assign({}, newState);
+      return Object.assign({}, state, newState);
     case FEMALE:
       newState = Object.assign({}, state);
       newState.filterBy.gender = action.payload;
       newApartments = filterApartments(newState.filterBy);
       newState.apartments = newApartments;
       newState.numOfApts = newApartments.length;
-      return Object.assign({}, newState);
+      return Object.assign({}, state, newState);
     case PRIVATE:
       newState = Object.assign({}, state);
       newState.filterBy.priv = action.payload;
       newApartments = filterApartments(newState.filterBy);
       newState.apartments = newApartments;
       newState.numOfApts = newApartments.length;
-      return Object.assign({}, newState);
+      return Object.assign({}, state, newState);
     case SHARED:
       newState = Object.assign({}, state);
       newState.filterBy.shared = action.payload;
       newApartments = filterApartments(newState.filterBy);
       newState.apartments = newApartments;
       newState.numOfApts = newApartments.length;
-      return Object.assign({}, newState);
+      return Object.assign({}, state, newState);
     case BEDS:
       newState = Object.assign({}, state);
       newState.filterBy.beds = action.payload;
       newApartments = filterApartments(newState.filterBy);
       newState.apartments = newApartments;
       newState.numOfApts = newApartments.length;
-      return Object.assign({}, newState);
+      return Object.assign({}, state, newState);
     case BATHS:
       newState = Object.assign({}, state);
       newState.filterBy.baths = action.payload;
       newApartments = filterApartments(newState.filterBy);
       newState.apartments = newApartments;
       newState.numOfApts = newApartments.length;
-      return Object.assign({}, newState);
+      return Object.assign({}, state, newState);
     case LENGTH:
       newState = Object.assign({}, state);
       newState.filterBy.len = action.payload;
       newApartments = filterApartments(newState.filterBy);
       newState.apartments = newApartments;
       newState.numOfApts = newApartments.length;
-      return Object.assign({}, newState);
+      return Object.assign({}, state, newState);
     case RENT_MIN:
       newState = Object.assign({}, state);
       newState.filterBy.min = action.payload;
       newApartments = filterApartments(newState.filterBy);
       newState.apartments = newApartments;
       newState.numOfApts = newApartments.length;
-      return Object.assign({}, newState);
+      return Object.assign({}, state, newState);
     case RENT_MAX:
       newState = Object.assign({}, state);
       newState.filterBy.max = action.payload;
       newApartments = filterApartments(newState.filterBy);
       newState.apartments = newApartments;
       newState.numOfApts = newApartments.length;
-      return Object.assign({}, newState);
+      return Object.assign({}, state, newState);
     case UTILITIES:
       newState = Object.assign({}, state);
       newState.filterBy.utilities.push(action.payload);
       newApartments = filterApartments(newState.filterBy);
       newState.apartments = newApartments;
       newState.numOfApts = newApartments.length;
-      return Object.assign({}, newState);
+      return Object.assign({}, state, newState);
     case AMENITIES:
       newState = Object.assign({}, state);
       newState.filterBy.amenities.push(action.payload);
       newApartments = filterApartments(newState.filterBy);
       newState.apartments = newApartments;
       newState.numOfApts = newApartments.length;
-      return Object.assign({}, newState);
+      return Object.assign({}, state, newState);
     case REMOVE_MALE:
       newState = Object.assign({}, state);
       newState.filterBy.gender = action.payload;
       newApartments = filterApartments(newState.filterBy);
       newState.apartments = newApartments;
       newState.numOfApts = newApartments.length;
-      return Object.assign({}, newState);
+      return Object.assign({}, state, newState);
     case REMOVE_FEMALE:
       newState = Object.assign({}, state);
       newState.filterBy.gender = action.payload;
       newApartments = filterApartments(newState.filterBy);
       newState.apartments = newApartments;
       newState.numOfApts = newApartments.length;
-      return Object.assign({}, newState);
+      return Object.assign({}, state, newState);
     case REMOVE_PRIVATE:
       newState = Object.assign({}, state);
       newState.filterBy.priv = action.payload;
       newApartments = filterApartments(newState.filterBy);
       newState.apartments = newApartments;
       newState.numOfApts = newApartments.length;
-      return Object.assign({}, newState);
+      return Object.assign({}, state, newState);
     case REMOVE_SHARED:
       newState = Object.assign({}, state);
       newState.filterBy.shared = action.payload;
       newApartments = filterApartments(newState.filterBy);
       newState.apartments = newApartments;
       newState.numOfApts = newApartments.length;
-      return Object.assign({}, newState);
+      return Object.assign({}, state, newState);
     case REMOVE_BEDS:
       newState = Object.assign({}, state);
       newState.filterBy.beds = action.payload;
       newApartments = filterApartments(newState.filterBy);
       newState.apartments = newApartments;
       newState.numOfApts = newApartments.length;
-      return Object.assign({}, newState);
+      return Object.assign({}, state, newState);
     case REMOVE_BATHS:
       newState = Object.assign({}, state);
       newState.filterBy.baths = action.payload;
       newApartments = filterApartments(newState.filterBy);
       newState.apartments = newApartments;
       newState.numOfApts = newApartments.length;
-      return Object.assign({}, newState);
+      return Object.assign({}, state, newState);
     case REMOVE_LENGTH:
       newState = Object.assign({}, state);
       newState.filterBy.len = action.payload;
       newApartments = filterApartments(newState.filterBy);
       newState.apartments = newApartments;
       newState.numOfApts = newApartments.length;
-      return Object.assign({}, newState);
+      return Object.assign({}, state, newState);
     case REMOVE_RENT_MIN:
       newState = Object.assign({}, state);
       newState.filterBy.min = action.payload;
       newApartments = filterApartments(newState.filterBy);
       newState.apartments = newApartments;
       newState.numOfApts = newApartments.length;
-      return Object.assign({}, newState);
+      return Object.assign({}, state, newState);
     case REMOVE_RENT_MAX:
       newState = Object.assign({}, state);
       newState.filterBy.max = action.payload;
       newApartments = filterApartments(newState.filterBy);
       newState.apartments = newApartments;
       newState.numOfApts = newApartments.length;
-      return Object.assign({}, newState);
+      return Object.assign({}, state, newState);
     case REMOVE_UTILITIES:
       newState = Object.assign({}, state);
       newState.filterBy.utilities.splice(newState.filterBy.utilities.indexOf(action.payload), 1);
       newApartments = filterApartments(newState.filterBy);
       newState.apartments = newApartments;
       newState.numOfApts = newApartments.length;
-      return Object.assign({}, newState);
+      return Object.assign({}, state, newState);
     case REMOVE_AMENITIES:
       newState = Object.assign({}, state);
       newState.filterBy.amenities.splice(newState.filterBy.amenities.indexOf(action.payload), 1);
       newApartments = filterApartments(newState.filterBy);
       newState.apartments = newApartments;
       newState.numOfApts = newApartments.length;
-      return Object.assign({}, newState);
+      return Object.assign({}, state, newState);
     default: return state;
   }
 }

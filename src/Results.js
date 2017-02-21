@@ -14,7 +14,7 @@ class Results extends Component {
               <div className="result">
                 <ul>
                   <li>{apartment.name}</li>
-                  <li>${apartment.yrSharedRent[0]}/mo</li>
+                  <li>${apartment.displayRate}/mo</li>
                 </ul>
               </div>
             </div>

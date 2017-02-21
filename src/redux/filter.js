@@ -23,6 +23,7 @@ const REMOVE_RENT_MIN = 'aptFilter/REMOVE_RENT_MIN';
 const REMOVE_RENT_MAX = 'aptFilter/REMOVE_RENT_MAX';
 const REMOVE_UTILITIES = 'aptFilter/REMOVE_UTILITIES';
 const REMOVE_AMENITIES = 'aptFilter/REMOVE_AMENITIES';
+const RESET = 'aptFilter/RESET';
 
 const initialState = {
   filterBy: {
@@ -581,6 +582,11 @@ export default function reducer(state=initialState, action) {
       newState.apartments = newApartments;
       newState.numOfApts = newApartments.length;
       return Object.assign({}, state, newState);
+    case RESET:
+      newState = Object.assign({}, state);
+      newState.apartments = [];
+      newState.numOfApts = 0;
+      return Object.assign({}, state, newState);
     default: return state;
   }
 }
@@ -743,5 +749,11 @@ export function removeAmenities(amenities) {
   return {
     type: REMOVE_AMENITIES,
     payload: amenities
+  }
+}
+
+export function resetApartments() {
+  return {
+    type: RESET
   }
 }

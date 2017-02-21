@@ -2451,9 +2451,9 @@ const apartments = [
     "comment": "and one block to campus"
   },
   {
-    "name": "The Lodges at",
-    "phone": "Glenwood",
-    "address": "801-374-9090 1565 N University Ave, 84604",
+    "name": "The Lodges at Glenwood",
+    "phone": "801-374-9090",
+    "address": "1565 N University Ave, 84604",
     "website": "glenwoodapt.com",
     "gender": [
       "M",
@@ -2844,9 +2844,9 @@ const apartments = [
     "comment": ""
   },
   {
-    "name": "Pacific Heights",
-    "phone": "Apts",
-    "address": "801-819-9090 737 N 900 E, 84606",
+    "name": "Pacific Heights Apts",
+    "phone": "801-819-9090",
+    "address": "737 N 900 E, 84606",
     "website": "theheightsprovo.com",
     "gender": [
       "W"
@@ -9152,9 +9152,9 @@ const apartments = [
     "comment": "Large house; 2 units updated; off street parking."
   },
   {
-    "name": "Colony Houses (Log, others) 801-374-5446",
-    "phone": "496",
-    "address": "N 700 E, 84606",
+    "name": "Colony Houses (Log, others)",
+    "phone": "801-374-5446",
+    "address": "496 N 700 E, 84606",
     "website": "thecolony-apts.com",
     "gender": [
       "M",

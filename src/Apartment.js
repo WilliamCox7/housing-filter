@@ -49,6 +49,34 @@ class Apartment extends Component {
             if (apartment.amenities.toString().indexOf(prop) >= 0) { displayObj[prop] = 'button-primary'; }
           }
         }
+        if (Array.isArray(apartment.len)) {
+          apartment.len = apartment.len.join(', ');
+        }
+        var rentVals = [];
+        if (apartment.yrPrivateRent.length > 0) {
+          rentVals.push(apartment.yrPrivateRent[0]);
+        }
+        if (apartment.fwPrivateRent.length > 0) {
+          rentVals.push(apartment.fwPrivateRent[0]);
+        }
+        if (apartment.spSuPrivateRent.length > 0) {
+          rentVals.push(apartment.spSuPrivateRent[0]);
+        }
+        if (apartment.yrSharedRent.length > 0) {
+          rentVals.push(apartment.yrSharedRent[0]);
+        }
+        if (apartment.fwSharedRent.length > 0) {
+          rentVals.push(apartment.fwSharedRent[0]);
+        }
+        if (apartment.spSuSharedRent.length > 0) {
+          rentVals.push(apartment.spSuSharedRent[0]);
+        }
+        function compareNumbers(a, b) {
+          return a - b;
+        }
+        rentVals.sort(compareNumbers);
+        apartment.minRate = rentVals[0];
+        apartment.maxRate = rentVals[rentVals.length - 1];
         return (
           <div key={i} className="App container">
             <div className="App-header">
@@ -58,7 +86,7 @@ class Apartment extends Component {
               <Link id="backbutton" to="/"><img src={backButton} /></Link>
               <span>{apartment.address}</span>
               <span>{apartment.phone}</span>
-              <span><a target="_blank" href={apartment.website}>{apartment.website}</a></span>
+              <span><a target="_blank" href={"//" + apartment.website}>{apartment.website}</a></span>
             </div>
             <div id="first-mid" className="App-content-mid">
               <div className="content-group-1">
@@ -75,7 +103,7 @@ class Apartment extends Component {
                 <span>Length:</span><span className="spanResult">{apartment.len}</span>
               </div>
               <div className="content-group-1 short-input">
-                <span>Rent:</span><span className="spanResult">${apartment.yrSharedRent[0]} - ${apartment.yrSharedRent[1]}/mo</span>
+                <span>Rent:</span><span className="spanResult">${apartment.minRate} - ${apartment.maxRate}/mo</span>
               </div>
               <div className="content-group-1">
                 <button className={displayObj.priv}><p>Private</p></button>

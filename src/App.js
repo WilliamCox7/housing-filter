@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import {filterName} from './redux/filter';
+import {resetApartments} from './redux/filter';
 import Advanced from './Advanced.js';
 import Results from './Results.js';
 import './normalize.css';
@@ -16,6 +17,7 @@ class App extends Component {
     }
     this.toggleAdvanced = this.toggleAdvanced.bind(this);
     this.filterName = this.filterName.bind(this);
+    this.props.resetApartments();
   }
 
   toggleAdvanced(event) {
@@ -52,7 +54,8 @@ class App extends Component {
 }
 
 const mapDispatchToProps = {
-  filterName: filterName
+  filterName: filterName,
+  resetApartments: resetApartments
 }
 
 function mapStateToProps(state) {

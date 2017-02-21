@@ -88,6 +88,31 @@
   padding: 5px;
 }
 
+.next {
+  display: flex;
+  justify-content: space-between;
+  width: 330px;
+  padding: 40px 0px;
+  margin: auto;
+}
+
+.all-res {
+  display: flex;
+  justify-content: space-around;
+  width: 330px;
+  padding: 40px 0px;
+  margin: auto;
+}
+
+.next button {
+  padding: 0px 5px;
+  height: 30px;
+}
+
+.next button p {
+  margin-top: -5px;
+}
+
 .App-content-mid .content-group {
   display: flex;
   margin: 0px 15px;
@@ -195,6 +220,15 @@
 @media (max-width: 480px) {
   #first-mid {
     display: block;
+  }
+  .App-content-mid button {
+    max-width: none;
+  }
+  .App .contact-info {
+    flex-direction: column;
+  }
+  .next {
+    width: 280px;
   }
 }
 
